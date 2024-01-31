@@ -48,20 +48,18 @@ import sys, random, os, json, random, configparser
 
 def parseProperties():
     """
-    Method to parse username and total number of HOL participants
+    Method to parse total number of HOL participants argument
     """
     try:
-        config = configparser.ConfigParser()
-        config.read('/app/mount/jobCode/parameters.conf')
-        username=config.get("general","username")
-        max=config.get("general","max")
+        print("JOB ARGUMENTS")
+        maxParticipants = sys.argv[1]
     except Exception as e:
         print("READING CONFIG PROPERTIES UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
 
-    return username, max
+    return maxParticipants
 
 
 def createSparkSession():
@@ -143,6 +141,7 @@ def createTable(bankTransactionsDf, dbname, username):
         print(f'caught {type(e)}: e')
         print(e)
 
+
 def validateTable(spark, dbname):
     """
     Method to validate the successful creation of user's DB and Table
@@ -160,10 +159,10 @@ def validateTable(spark, dbname):
 
 def main():
 
-    username, max = parseProperties()
+    maxParticipants = parseProperties()
     spark = createSparkSession()
 
-    for i in range(int(max)):
+    for i in range(int(maxParticipants)):
         if i+1 < 10:
             username = "user00" + str(i+1)
         elif i+1 > 9 & i+1 < 99:
