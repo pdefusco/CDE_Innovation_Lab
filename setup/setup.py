@@ -51,10 +51,10 @@ def parseProperties():
     Method to parse total number of HOL participants argument
     """
     try:
-        print("JOB ARGUMENTS")
+        print("PARSING JOB ARGUMENTS...")
         maxParticipants = sys.argv[1]
     except Exception as e:
-        print("READING CONFIG PROPERTIES UNSUCCESSFUL")
+        print("READING JOB ARG UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -76,7 +76,7 @@ def createSparkSession():
             .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")\
             .getOrCreate()
     except Exception as e:
-        print("READING CONFIG PROPERTIES UNSUCCESSFUL")
+        print("LAUNCHING SPARK SESSION UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -84,7 +84,7 @@ def createSparkSession():
     return spark
 
 
-def createDatabase(dbname):
+def createDatabase(spark, dbname):
     """
     Method to create a Database for the Specified User
     """
@@ -97,7 +97,7 @@ def createDatabase(dbname):
         spark.sql("SHOW DATABASES LIKE '{}'".format(dbname)).show()
         print("\n")
     except Exception as e:
-        print("READING CONFIG PROPERTIES UNSUCCESSFUL")
+        print("CREATING DATABASE UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -113,7 +113,7 @@ def createData(spark):
         dg = BankDataGen(spark)
         bankTransactionsDf = dg.bankDataGen()
     except Exception as e:
-        print("READING CONFIG PROPERTIES UNSUCCESSFUL")
+        print("CREATING TABLE UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -136,7 +136,7 @@ def createTable(bankTransactionsDf, dbname, username):
             .tableProperty("write.format.default", "parquet")\
             .createOrReplace()
     except Exception as e:
-        print("READING CONFIG PROPERTIES UNSUCCESSFUL")
+        print("CREATING SYNTHETIC DATA UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -172,10 +172,10 @@ def main():
 
         print("PROCESSING USER {}...\n".format(username))
 
-        createDatabase(username)
+        createDatabase(spark, username)
         df = createData(spark)
         createTable(df, username, username)
-        validateTable(spark, dbname)
+        validateTable(spark, username)
 
 
 if __name__ == "__main__":
