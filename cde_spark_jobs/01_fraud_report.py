@@ -117,6 +117,5 @@ eucDistDf = joinDf.withColumn("DIST_FROM_HOME", eu_dist(F.col("address_longitude
                                       F.col("longitude"), F.col("address_latitude"), \
                                        F.col("latitude")))
 
-
 # SELECT CUSTOMERS WHERE TRANSACTION OCCURRED MORE THAN 100 MILES FROM HOME
 eucDistDf.filter(eucDistDf.DIST_FROM_HOME > 100).show()

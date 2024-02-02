@@ -84,6 +84,9 @@ incReadDf = spark.read\
 print("Inc Schema:")
 incReadDf.printSchema()
 
+print("Incremental Report:")
+incReadDf.show()
+
 #---------------------------------------------------
 #               JOIN INCREMENTAL READ WITH CUST INFO
 #---------------------------------------------------
@@ -107,4 +110,6 @@ distanceDf = distanceDf.filter(distanceDf.trx_dist_from_home > 100)
 #               SAVE DATA TO NEW ICEBERG TABLE
 #---------------------------------------------------
 
-distanceDf.writeTo("spark_catalog.{}.POTENTIAL_NEW_FRAUD".format(username)).createOrReplace()
+distanceDf.show()
+
+#distanceDf.writeTo("spark_catalog.{}.POTENTIAL_NEW_FRAUD".format(username)).create()
