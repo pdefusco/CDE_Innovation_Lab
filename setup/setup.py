@@ -53,13 +53,14 @@ def parseProperties():
     try:
         print("PARSING JOB ARGUMENTS...")
         maxParticipants = sys.argv[1]
+        storageLocation = sys.argv[2]
     except Exception as e:
         print("READING JOB ARG UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
 
-    return maxParticipants
+    return maxParticipants, storageLocation
 
 
 def createSparkSession():
@@ -71,9 +72,6 @@ def createSparkSession():
         spark = SparkSession \
             .builder \
             .appName("BANK TRANSACTIONS LOAD") \
-            .config("spark.sql.catalog.spark_catalog", "org.apache.iceberg.spark.SparkSessionCatalog")\
-            .config("spark.sql.catalog.spark_catalog.type", "hive")\
-            .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")\
             .getOrCreate()
     except Exception as e:
         print("LAUNCHING SPARK SESSION UNSUCCESSFUL")
@@ -84,26 +82,7 @@ def createSparkSession():
     return spark
 
 
-def createDatabase(spark, dbname):
-    """
-    Method to create a Database for the Specified User
-    """
-    try:
-        print("CREATING BANKING TRANSACTIONS DATABASE...")
-        spark.sql("DROP DATABASE IF EXISTS {} CASCADE".format(dbname))
-        spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(dbname))
-
-        print("SHOW DATABASES LIKE '{}'".format(dbname))
-        spark.sql("SHOW DATABASES LIKE '{}'".format(dbname)).show()
-        print("\n")
-    except Exception as e:
-        print("CREATING DATABASE UNSUCCESSFUL")
-        print('\n')
-        print(f'caught {type(e)}: e')
-        print(e)
-
-
-def createData(spark):
+def createTransactionData(spark):
     """
     Method to create a Banking Transactions dataframe using the dbldatagen and Faker frameworks
     """
@@ -111,47 +90,107 @@ def createData(spark):
     try:
         print("CREATING BANKING TRANSACTIONS DF...\n")
         dg = BankDataGen(spark)
-        bankTransactionsDf = dg.bankDataGen()
+        transactionsDf = dg.transactionsDataGen()
     except Exception as e:
-        print("CREATING TABLE UNSUCCESSFUL")
+        print("CREATING TRANSACTION DATA UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
 
-    return bankTransactionsDf
+    return transactionsDf
 
 
-def createTable(bankTransactionsDf, dbname, username):
+def createTransactionBatch(spark):
     """
-    Method to create an Iceberg Table to store Banking Transactions
+    Method to create a Banking Transactions dataframe using the dbldatagen and Faker frameworks
     """
-
-    print("CREATING BANKING TRANSACTIONS TABLE...\n")
 
     try:
-        bankTransactionsDf\
-            .writeTo("{0}.BNK_TRNS_{1}"\
-            .format(dbname, username))\
-            .using("iceberg")\
-            .tableProperty("write.format.default", "parquet")\
-            .createOrReplace()
+        print("CREATING BANKING TRANSACTIONS DF...\n")
+        dg = BankDataGen(spark)
+        transactionsBatchDf = dg.transactionsBatchDataGen()
     except Exception as e:
-        print("CREATING SYNTHETIC DATA UNSUCCESSFUL")
+        print("CREATING TRANSACTION DATA UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+    return transactionsBatchDf
+
+
+def createPiiData(spark):
+    """
+    Method to create a Banking Pii dataframe using the dbldatagen and Faker frameworks
+    """
+
+    try:
+        print("CREATING BANKING PII DF...\n")
+        dg = BankDataGen(spark)
+        piiDf = dg.piiDataGen()
+    except Exception as e:
+        print("CREATING PII DATA UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+    return piiDf
+
+
+def saveTransactionData(bankTransactionsDf, storageLocation, username):
+    """
+    Method to save banking transactions to Cloud Storage in Json format
+    """
+
+    print("SAVING BANKING TRANSACTIONS TO JSON IN CLOUD STORAGE...\n")
+
+    try:
+        bankTransactionsDf. \
+            write. \
+            format("json"). \
+            mode("overwrite"). \
+            save("{0}/mkthol/trans/{1}/transactions.json".format(storageLocation, username))
+    except Exception as e:
+        print("SAVING SYNTHETIC TRANSACTION DATA UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
 
 
-def validateTable(spark, dbname):
+def saveTransactionBatch(transactionsBatchDf, storageLocation, username):
     """
-    Method to validate the successful creation of user's DB and Table
+    Method to save banking transactions to Cloud Storage in Json format
     """
 
+    print("SAVING TRANSACTIONS BATCH TO JSON IN CLOUD STORAGE...\n")
+
     try:
-        print("VALIDATING DATABASE AND TABLES {}\n".format(dbname))
-        spark.sql("SHOW TABLES IN {}".format(dbname))
+        transactionsBatchDf. \
+            write. \
+            format("json"). \
+            mode("overwrite"). \
+            save("{0}/mkthol/trans/{1}/trx_batch.json".format(storageLocation, username))
     except Exception as e:
-        print("VALIDATING DATABASE UNSUCCESSFUL")
+        print("SAVING TRANSACTION BATCH UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+
+def savePiiData(piiDf, storageLocation, username):
+    """
+    Method to save banking transactions to Cloud Storage in csv format
+    """
+
+    print("SAVING PII DF TO CSV IN CLOUD STORAGE...\n")
+
+    try:
+        piiDf \
+            .write. \
+            mode('overwrite') \
+            .options(header='True', delimiter=',') \
+            .csv("{0}/mkthol/pii/{1}/pii.csv".format(storageLocation, username))
+    except Exception as e:
+        print("SAVING SYNTHETIC TRANSACTION DATA UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -159,7 +198,8 @@ def validateTable(spark, dbname):
 
 def main():
 
-    maxParticipants = parseProperties()
+    maxParticipants, storageLocation = parseProperties()
+
     spark = createSparkSession()
 
     for i in range(int(maxParticipants)):
@@ -172,10 +212,14 @@ def main():
 
         print("PROCESSING USER {}...\n".format(username))
 
-        createDatabase(spark, username)
-        df = createData(spark)
-        createTable(df, username, username)
-        validateTable(spark, username)
+        bankTransactionsDf = createTransactionData(spark)
+        saveTransactionData(bankTransactionsDf, storageLocation, username)
+
+        piiDf = createPiiData(spark)
+        savePiiData(piiDf, storageLocation, username)
+
+        transactionsBatchDf = createTransactionBatch(spark)
+        saveTransactionBatch(transactionsBatchDf, storageLocation, username)
 
 
 if __name__ == "__main__":

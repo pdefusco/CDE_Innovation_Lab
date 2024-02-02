@@ -41,11 +41,15 @@ import os
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from pyspark.sql.types import LongType, IntegerType, StringType
 import dbldatagen as dg
 import dbldatagen.distributions as dist
 from dbldatagen import FakerTextFactory, DataGenerator, fakerText
 from faker.providers import bank, credit_card, currency
+from pyspark.sql.types import LongType, FloatType, IntegerType, StringType, \
+                              DoubleType, BooleanType, ShortType, \
+                              TimestampType, DateType, DecimalType, \
+                              ByteType, BinaryType, ArrayType, MapType, \
+                              StructType, StructField
 
 class BankDataGen:
 
@@ -54,7 +58,65 @@ class BankDataGen:
     def __init__(self, spark):
         self.spark = spark
 
-    def bankDataGen(self, shuffle_partitions_requested = 10, partitions_requested = 10, data_rows = 10000):
+    def transactionsDataGen(self, shuffle_partitions_requested = 10, partitions_requested = 10, data_rows = 10000):
+
+        # setup use of Faker
+        FakerTextUS = FakerTextFactory(locale=['en_US'], providers=[bank])
+
+        # partition parameters etc.
+        self.spark.conf.set("spark.sql.shuffle.partitions", shuffle_partitions_requested)
+
+        fakerDataspec = (DataGenerator(self.spark, rows=data_rows, partitions=partitions_requested)
+                    .withColumn("credit_card_number", "long", minValue=3133411782012345, maxValue=3174567891123456, uniqueValues=1000, random=True, randomSeed=3) #text=FakerTextUS("credit_card_number")
+                    .withColumn("credit_card_provider", text=FakerTextUS("credit_card_provider") )
+                    .withColumn("transaction_type", "string", values=["purchase", "cash_advance"], random=True, weights=[9, 1])
+                    .withColumn("event_ts", "timestamp", begin="2023-01-01 01:00:00",end="2023-12-31 23:59:00",interval="1 minute", random=True)
+                    .withColumn("longitude", "float", minValue=-125, maxValue=-66.9345, random=True)
+                    .withColumn("latitude", "float", minValue=24.3963, maxValue=49.3843, random=True)
+                    .withColumn("transaction_currency", values=["USD", "EUR", "KWD", "BHD", "GBP", "CHF", "MEX"])
+                    .withColumn("transaction_amount", "decimal", minValue=0.01, maxValue=30000, random=True)
+                    .withColumn("transaction", StructType([StructField('transaction_currency', StringType()), StructField('transaction_amount', StringType()), StructField('transaction_type', StringType())]),
+                    expr="named_struct('transaction_currency', transaction_currency, 'transaction_amount', transaction_amount, 'transaction_type', transaction_type)",
+                    baseColumn=['transaction_currency', 'transaction_currency', 'transaction_type'])
+                    .withColumn("transaction_geolocation", StructType([StructField('latitude',StringType()), StructField('longitude', StringType())]),
+                      expr="named_struct('latitude', latitude, 'longitude', longitude)",
+                      baseColumn=['latitude', 'longitude'])
+                    )
+
+        df = fakerDataspec.build()
+
+        df = df.drop(*('latitude', 'longitude', 'transaction_currency', 'transaction_amount', 'transaction_type'))
+
+        df = df.withColumn("credit_card_number", df["credit_card_number"].cast("string"))
+
+        return df
+
+    def transactionsBatchDataGen(self, shuffle_partitions_requested = 1, partitions_requested = 1, data_rows = 100):
+
+        # setup use of Faker
+        FakerTextUS = FakerTextFactory(locale=['en_US'], providers=[bank])
+
+        # partition parameters etc.
+        self.spark.conf.set("spark.sql.shuffle.partitions", shuffle_partitions_requested)
+
+        fakerDataspec = (DataGenerator(self.spark, rows=data_rows, partitions=partitions_requested)
+                    .withColumn("credit_card_number", "long", minValue=3174567891123457, maxValue=3174567891199999, uniqueValues=100, random=True) #text=FakerTextUS("credit_card_number")
+                    .withColumn("credit_card_provider", text=FakerTextUS("credit_card_provider"))
+                    .withColumn("transaction_type", "string", values=["purchase", "cash_advance"], random=True, weights=[9, 1])
+                    .withColumn("event_ts", "timestamp", begin="2023-01-01 01:00:00",end="2023-12-31 23:59:00",interval="1 minute", random=True)
+                    .withColumn("longitude", "float", minValue=-125, maxValue=-66.9345, random=True)
+                    .withColumn("latitude", "float", minValue=24.3963, maxValue=49.3843, random=True)
+                    .withColumn("transaction_currency", values=["USD", "EUR", "KWD", "BHD", "GBP", "CHF", "MEX"])
+                    .withColumn("transaction_amount", "decimal", minValue=0.01, maxValue=30000, random=True)
+                    )
+
+        df = fakerDataspec.build()
+        df = df.withColumn("credit_card_number", df["credit_card_number"].cast("string"))
+
+        return df
+
+
+    def piiDataGen(self, shuffle_partitions_requested = 10, partitions_requested = 10, data_rows = 10000):
 
         # setup use of Faker
         FakerTextUS = FakerTextFactory(locale=['en_US'], providers=[bank])
@@ -65,21 +127,18 @@ class BankDataGen:
         fakerDataspec = (DataGenerator(self.spark, rows=data_rows, partitions=partitions_requested)
                     .withColumn("name", percentNulls=0.1, text=FakerTextUS("name") )
                     .withColumn("address", text=FakerTextUS("address" ))
+                    .withColumn("address_longitude", "float", minValue=-125, maxValue=-66.9345, random=True)
+                    .withColumn("address_latitude", "float", minValue=24.3963, maxValue=49.3843, random=True)
                     .withColumn("email", text=FakerTextUS("ascii_company_email") )
                     .withColumn("aba_routing", text=FakerTextUS("aba" ))
                     .withColumn("bank_country", text=FakerTextUS("bank_country") )
                     .withColumn("account_no", text=FakerTextUS("bban" ))
                     .withColumn("int_account_no", text=FakerTextUS("iban") )
                     .withColumn("swift11", text=FakerTextUS("swift11" ))
-                    .withColumn("credit_card_number", text=FakerTextUS("credit_card_number") )
-                    .withColumn("credit_card_provider", text=FakerTextUS("credit_card_provider") )
-                    .withColumn("event_type", "string", values=["purchase", "cash_advance"],random=True)
-                    .withColumn("event_ts", "timestamp", begin="2020-01-01 01:00:00",end="2020-12-31 23:59:00",interval="1 minute", random=True )
-                    .withColumn("longitude", "float", minValue=-180, maxValue=180, random=True)
-                    .withColumn("latitude", "float", minValue=-90, maxValue=90, random=True)
-                    .withColumn("transaction_currency", values=["USD", "EUR", "KWD", "BHD", "GBP", "CHF", "MEX"])
-                    .withColumn("transaction_amount", "decimal", minValue=0.01, maxValue=30000, random=True)
+                    .withColumn("credit_card_number", "long", minValue=3133411782012345, maxValue=3174567891123456, uniqueValues=1000, random=True, randomSeed=3)
                     )
+
         df = fakerDataspec.build()
+        df = df.withColumn("credit_card_number", df["credit_card_number"].cast("string"))
 
         return df

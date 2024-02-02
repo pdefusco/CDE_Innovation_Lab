@@ -3,8 +3,9 @@
 docker_user=$1
 cde_user=$2
 max_participants=$3
+storage_location=$4
 
-echo "CDE MKT HOL - DATA QUALITY DEMO DEPLOYMENT INITIATED...."
+echo "CDE BNK HOL DEPLOYMENT INITIATED...."
 echo "..."
 echo ".."
 echo "."
@@ -27,7 +28,7 @@ cde resource upload --name mkt-hol-setup-$cde_user --local-path setup.py
 
 # CREATE SETUP JOB
 echo "Create job mkt-hol-setup-"$cde_user
-cde job create --name mkt-hol-setup-$cde_user --type spark --arg $max_participants --mount-1-resource mkt-hol-setup-$cde_user --application-file setup.py --runtime-image-resource-name dex-spark-runtime-$cde_user
+cde job create --name mkt-hol-setup-$cde_user --type spark --arg $max_participants --arg $storage_location --mount-1-resource mkt-hol-setup-$cde_user --application-file setup.py --runtime-image-resource-name dex-spark-runtime-$cde_user
 echo "Run job mkt-hol-setup-"$cde_user
 cde job run --name mkt-hol-setup-$cde_user
 
@@ -35,4 +36,5 @@ echo " "
 echo "."
 echo ".."
 echo "..."
-echo ".... CDE MKT HOL SETUP COMPLETED"
+echo ".... CDE MKT HOL DEPLOYMENT IN PROGRESS"
+echo ".... CHECK CDE UI TO CONFIRM SUCCESSFUL DEPLOYMENT"

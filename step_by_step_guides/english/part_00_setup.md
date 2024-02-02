@@ -96,7 +96,12 @@ from airflow.models.param import Param
 Run the autodeploy script with:
 
 ```
-./auto_deploy_hol.sh dockerusername cdpworkloaduser maxparticipants
+./auto_deploy_hol.sh dockerUser cdpWorkloadUser maxParticipants storageLocation
+
+./auto_deploy_hol.sh pauldefusco pauldefusco 101 s3a://goes-se-sandbox01
+
+./auto_deploy_hol.sh pauldefusco pauldefusco 11 s3a://go01-demo  
+
 ```
 
 Before running this be prepared to enter your Docker credentials in the terminal. Then, you can follow progress in the terminal output. The pipeline should deploy within three minutes. When setup is complete navigate to the CDE UI and validate that the demo has been deployed. By now the setup_job should have completed and the airflow_orchestration job should already be in process.
