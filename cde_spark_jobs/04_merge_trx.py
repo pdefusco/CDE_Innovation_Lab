@@ -41,7 +41,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
 import sys, random, os, json, random, configparser
-from fraud_utils import *
+from utils import *
 
 spark = SparkSession \
     .builder \
@@ -65,18 +65,24 @@ print("PySpark Runtime Arg: ", sys.argv[1])
 
 trxBatchDf = spark.read.json("{0}/mkthol/trans/{1}/trx_batch.json".format(storageLocation, username))
 
+trxBatchDf = trxBatchDf.withColumn("transaction_amount",  trxBatchDf["transaction_amount"].cast('float'))
+trxBatchDf = trxBatchDf.withColumn("latitude",  trxBatchDf["latitude"].cast('float'))
+trxBatchDf = trxBatchDf.withColumn("longitude",  trxBatchDf["longitude"].cast('float'))
+trxBatchDf = trxBatchDf.withColumn("event_ts", trxBatchDf["event_ts"].cast("timestamp"))
+
 #---------------------------------------------------
 #               MIGRATE TRX DATA TO ICEBERG
 #---------------------------------------------------
 
-spark.sql("ALTER TABLE {}.TRX_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
-spark.sql("CALL spark_catalog.system.migrate('{}.TRX_TABLE')".format(username))
+# Already done in CDE Session Iceberg Part 2:
+#spark.sql("ALTER TABLE {}.TRX_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
+#spark.sql("CALL spark_catalog.system.migrate('{}.TRX_TABLE')".format(username))
 
 #---------------------------------------------------
 #               PARTITION TRX TABLE BY MONTH
 #---------------------------------------------------
 
-spark.sql("ALTER TABLE spark_catalog.{}.TRX_TABLE ADD PARTITION FIELD MONTH(event_ts) AS MON".format(username))
+spark.sql("ALTER TABLE spark_catalog.{}.TRX_TABLE ADD PARTITION FIELD MONTHS(event_ts) AS MON".format(username))
 
 #---------------------------------------------------
 #               MERGE TRX RECORDS
@@ -96,4 +102,4 @@ spark.sql(ICEBERG_MERGE_INTO_SYNTAX)
 #               PARTITION EVOLUTION TRX TABLE BY DAY
 #-----------------------------------------------------
 
-spark.sql("ALTER TABLE spark_catalog.{}.TRX_TABLE REPLACE PARTITION FIELD MON WITH DAY(event_ts) AS DY")"
+spark.sql("ALTER TABLE spark_catalog.{}.TRX_TABLE REPLACE PARTITION FIELD MON WITH DAYS(event_ts) AS DY".format(username))

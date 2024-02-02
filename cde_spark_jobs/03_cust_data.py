@@ -41,7 +41,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
 import sys, random, os, json, random, configparser
-from fraud_utils import *
+from utils import *
 
 spark = SparkSession \
     .builder \
@@ -63,16 +63,17 @@ print("PySpark Runtime Arg: ", sys.argv[1])
 #               MIGRATE CUST DATA TO ICEBERG
 #---------------------------------------------------
 
-spark.sql("ALTER TABLE {}.CUST_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
-spark.sql("CALL spark_catalog.system.migrate('{}.CUST_TABLE')".format(username))
+#spark.sql("ALTER TABLE {}.CUST_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
+#spark.sql("CALL spark_catalog.system.migrate('{}.CUST_TABLE')".format(username))
 
 #---------------------------------------------------
 #               CREATE REFINED CUSTOMER TABLE
 #---------------------------------------------------
 
+spark.sql("DROP TABLE IF EXISTS spark_catalog.{0}.CUST_TABLE_REFINED".format(username))
+
 spark.sql("""CREATE TABLE spark_catalog.{0}.CUST_TABLE_REFINED
                 USING iceberg
-                PARTITIONED BY (BANK_COUNTRY)
                 AS SELECT NAME, EMAIL, BANK_COUNTRY, ACCOUNT_NO, CREDIT_CARD_NUMBER, ADDRESS_LATITUDE, ADDRESS_LONGITUDE
                 FROM spark_catalog.{0}.CUST_TABLE""".format(username))
 
@@ -86,3 +87,9 @@ spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
 
 spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
                 ALTER COLUMN ADDRESS_LONGITUDE TYPE double""".format(username))
+
+#---------------------------------------------------
+#               VALIDATA TABLE
+#---------------------------------------------------
+
+spark.sql("""SELECT * FROM spark_catalog.{0}.CUST_TABLE_REFINED""".format(username)).show()

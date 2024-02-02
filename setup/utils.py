@@ -112,6 +112,7 @@ class BankDataGen:
 
         df = fakerDataspec.build()
         df = df.withColumn("credit_card_number", df["credit_card_number"].cast("string"))
+        df = df.dropDuplicates(['credit_card_number', 'credit_card_provider'])
 
         return df
 

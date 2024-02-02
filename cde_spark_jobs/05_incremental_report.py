@@ -41,7 +41,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
 import sys, random, os, json, random, configparser
-from fraud_utils import *
+from utils import *
 
 spark = SparkSession \
     .builder \
@@ -86,7 +86,7 @@ incReadDf = spark.read\
 #---------------------------------------------------
 
 ### LOAD CUSTOMER DATA REFINED
-custDf = spark.sql("SELECT * FROM spark_catalog.{}.CUST_TABLE_REFINED")
+custDf = spark.sql("SELECT * FROM spark_catalog.{}.CUST_TABLE_REFINED".format(username))
 finalReport = incReadDf.join(custDf, custDf.credit_card_number == incReadDf.credit_card_number, 'inner')
 
 distanceFunc = F.udf(lambda arr: (((arr[2]-arr[0])**2)+((arr[3]-arr[1])**2)**(1/2)), FloatType())
@@ -100,4 +100,4 @@ distanceDf = distanceDf.filter(distanceDf.trx_dist_from_home > 100)
 #               SAVE DATA TO NEW ICEBERG TABLE
 #---------------------------------------------------
 
-distanceDf.writeTo("spark_catalog.{}.POTENTIAL_NEW_FRAUD".format(username)).append()
+distanceDf.writeTo("spark_catalog.{}.POTENTIAL_NEW_FRAUD".format(username)).createOrReplace()

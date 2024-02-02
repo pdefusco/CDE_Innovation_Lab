@@ -96,6 +96,7 @@ joinDf = spark.sql("""SELECT i.name, i.address_longitude, i.address_latitude, i.
           r.credit_card_provider, r.event_ts, r.transaction_amount, r.longitude, r.latitude
           FROM {0}.CUST_TABLE i INNER JOIN {0}.TRX_TABLE r
           ON i.credit_card_number == r.credit_card_number;""".format(username))
+
 print("JOINDF SCHEMA")
 joinDf.printSchema()
 
