@@ -14,11 +14,14 @@ from pyspark.sql.types import *
 
 storageLocation = "s3a://go01-demo"
 username = "user002"
+```
 
+```
 ### WORKING WITH TRANSACTIONS FACT TABLE
 transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions.json".format(storageLocation, username))
 transactionsDf.printSchema()
-
+```
+```
 # Takes in a StructType schema object and return a column selector that flattens the Struct
 def flatten_struct(schema, prefix=""):
     result = []
@@ -28,72 +31,97 @@ def flatten_struct(schema, prefix=""):
         else:
             result.append(F.col(prefix + elem.name).alias(prefix + elem.name))
     return result
+```
 
-
+```
 # FLATTEN NESTED STRUCT
 transactionsDf = transactionsDf.select(flatten_struct(transactionsDf.schema))
 transactionsDf.printSchema()
-
+```
+```
 # RENAME COLS
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_amount", "transaction_amount")
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_currency", "transaction_currency")
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_type", "transaction_type")
 transactionsDf = transactionsDf.withColumnRenamed("transaction_geolocation.latitude", "latitude")
 transactionsDf = transactionsDf.withColumnRenamed("transaction_geolocation.longitude", "longitude")
-
+```
+```
 # CAST TYPES
 transactionsDf = transactionsDf.withColumn("transaction_amount",  transactionsDf["transaction_amount"].cast('float'))
 transactionsDf = transactionsDf.withColumn("latitude",  transactionsDf["latitude"].cast('float'))
 transactionsDf = transactionsDf.withColumn("longitude",  transactionsDf["longitude"].cast('float'))
+```
 
+```
 ### ANALYTICS ON TRANSACTIONS FACT TABLE ###
 transactionsAmountMean = round(transactionsDf.select(F.mean("transaction_amount")).collect()[0][0],2)
 transactionsAmountMedian = round(transactionsDf.stat.approxQuantile("transaction_amount", [0.5], 0.001)[0],2)
 
 print("Transaction Amount Mean: ", transactionsAmountMean)
 print("Transaction Amount Median: ", transactionsAmountMedian)
+```
 
+```
 #transactionsDf.select("event_ts")
 transactionsDf.createOrReplaceTempView("trx")
 spark.sql("SELECT * FROM trx LIMIT 10").show()
+```
 
+```
 # average transaction amount by month
 spark.sql("SELECT MONTH(event_ts) AS month, \
           avg(transaction_amount) FROM trx GROUP BY month ORDER BY month").show()
+```
 
+```
 # Average transaction amount by day of week
 spark.sql("SELECT DAYOFWEEK(event_ts) AS DAYOFWEEK, \
           avg(transaction_amount) FROM trx GROUP BY DAYOFWEEK ORDER BY DAYOFWEEK").show()
+```
 
+```
 # Number of transactions by credit card
 spark.sql("SELECT CREDIT_CARD_NUMBER, COUNT(*) AS COUNT FROM trx \
             GROUP BY CREDIT_CARD_NUMBER ORDER BY COUNT DESC LIMIT 10").show()
+```
 
+```
 ### PII DIMENSION TABLE
 piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii.csv".format(storageLocation, username))
 piiDf.show()
 piiDf.printSchema()
+```
 
+```
 ### CAST LAT LON AS FLOAT
 piiDf = piiDf.withColumn("address_latitude",  piiDf["address_latitude"].cast('float'))
 piiDf = piiDf.withColumn("address_longitude",  piiDf["address_longitude"].cast('float'))
 piiDf.createOrReplaceTempView("cust_info")
+```
 
+```
 # TOP 100 customers with multiple credit cards, sorted by highest to lowest
 spark.sql("SELECT name AS name, \
           COUNT(credit_card_number) AS CC_COUNT FROM cust_info GROUP BY name ORDER BY CC_COUNT DESC \
           LIMIT 100").show()
+```
 
+```
 # TOP 100 credit cards with multiple names, sorted by highest to lowest
 spark.sql("SELECT COUNT(name) AS NM_COUNT, \
           credit_card_number AS CC_NUM FROM cust_info GROUP BY CC_NUM ORDER BY NM_COUNT DESC \
           LIMIT 100").show()
+```
 
+```
 # TOP 25 customers with multiple addresses, sorted by highest to lowest
 spark.sql("SELECT name AS name, \
           COUNT(address) AS ADD_COUNT FROM cust_info GROUP BY name ORDER BY ADD_COUNT DESC \
           LIMIT 25").show()
+```
 
+```
 ### OPTIONAL: ADD A MORE ADVANCED QUERY E.G. WINDOWING
 
 ### JOIN TWO DATASETS AND COMPARE COORDINATES
@@ -102,11 +130,14 @@ joinDf = spark.sql("""SELECT i.name, i.address_longitude, i.address_latitude, i.
           FROM cust_info i INNER JOIN trx r
           ON i.credit_card_number == r.credit_card_number;""")
 joinDf.show()
-
+```
+```
 distanceFunc = F.udf(lambda arr: (((arr[2]-arr[0])**2)+((arr[3]-arr[1])**2)**(1/2)), FloatType())
 distanceDf = joinDf.withColumn("trx_dist_from_home", distanceFunc(F.array("latitude", "longitude",
                                                                             "address_latitude", "address_longitude")))
+```
 
+```
 # SELECT CUSTOMERS WHERE TRANSACTION OCCURRED MORE THAN 100 MILES FROM HOME
 distanceDf.filter(distanceDf.trx_dist_from_home > 100).show()
 ```

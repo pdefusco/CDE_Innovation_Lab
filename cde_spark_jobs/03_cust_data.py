@@ -89,8 +89,7 @@ spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
                 ALTER COLUMN ADDRESS_LONGITUDE TYPE double""".format(username))
 
 #---------------------------------------------------
-#               VALIDATA TABLES
+#               VALIDATA TABLE
 #---------------------------------------------------
-spark.sql("""SELECT * FROM spark_catalog.{}.CUST_TABLE""".format(username)).show()
 
 spark.sql("""SELECT * FROM spark_catalog.{}.CUST_TABLE_REFINED""".format(username)).show()
