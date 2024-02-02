@@ -12,7 +12,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
 
-storageLocation = "s3a://go01-demo"
+storageLocation = "s3a://cde-innovation-buk-9e384927/data"
 username = "user002"
 ```
 
