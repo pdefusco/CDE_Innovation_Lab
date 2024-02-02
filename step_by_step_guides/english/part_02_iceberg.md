@@ -47,7 +47,7 @@ trxBatchDf.createOrReplaceTempView("BATCH_TEMP_VIEW".format(username))
 ```
 
 ```
-ICEBERG_MERGE_INTO_SYNTAX = """MERGE INTO spark_catalog.{0}.TRX_TABLE t USING (SELECT * FROM {0}.BATCH_TEMP_VIEW) s
+ICEBERG_MERGE_INTO_SYNTAX = """MERGE INTO spark_catalog.{}.TRX_TABLE t USING (SELECT * FROM BATCH_TEMP_VIEW) s
    ON t.credit_card_number = s.credit_card_number WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *""".format(username)
 
 spark.sql(ICEBERG_MERGE_INTO_SYNTAX)
