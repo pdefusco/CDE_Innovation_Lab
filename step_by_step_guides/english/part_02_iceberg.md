@@ -11,7 +11,7 @@ Iceberg allows you to perform more advanced operations. In this Lab you will use
 ```
 from pyspark.sql.types import Row, StructField, StructType, StringType, IntegerType
 
-storageLocation = "s3a://go01-demo/"
+storageLocation = "s3a://cde-innovation-buk-9e384927/data"
 username = "user001"
 ```
 
