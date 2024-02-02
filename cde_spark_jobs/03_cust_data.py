@@ -63,8 +63,8 @@ print("PySpark Runtime Arg: ", sys.argv[1])
 #               MIGRATE CUST DATA TO ICEBERG
 #---------------------------------------------------
 
-#spark.sql("ALTER TABLE {}.CUST_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
-#spark.sql("CALL spark_catalog.system.migrate('{}.CUST_TABLE')".format(username))
+spark.sql("ALTER TABLE {}.CUST_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
+spark.sql("CALL spark_catalog.system.migrate('{}.CUST_TABLE')".format(username))
 
 #---------------------------------------------------
 #               CREATE REFINED CUSTOMER TABLE
@@ -89,7 +89,8 @@ spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
                 ALTER COLUMN ADDRESS_LONGITUDE TYPE double""".format(username))
 
 #---------------------------------------------------
-#               VALIDATA TABLE
+#               VALIDATA TABLES
 #---------------------------------------------------
+spark.sql("""SELECT * FROM spark_catalog.{}.CUST_TABLE""".format(username)).show()
 
-spark.sql("""SELECT * FROM spark_catalog.{0}.CUST_TABLE_REFINED""".format(username)).show()
+spark.sql("""SELECT * FROM spark_catalog.{}.CUST_TABLE_REFINED""".format(username)).show()

@@ -81,13 +81,20 @@ incReadDf = spark.read\
     .option("end-snapshot-id", last_snapshot)\
     .load("spark_catalog.{}.TRX_TABLE".format(username))
 
+print("Inc Schema:")
+incReadDf.printSchema()
+
 #---------------------------------------------------
 #               JOIN INCREMENTAL READ WITH CUST INFO
 #---------------------------------------------------
 
 ### LOAD CUSTOMER DATA REFINED
 custDf = spark.sql("SELECT * FROM spark_catalog.{}.CUST_TABLE_REFINED".format(username))
-finalReport = incReadDf.join(custDf, custDf.credit_card_number == incReadDf.credit_card_number, 'inner')
+
+print("Cust DF Schema: ")
+custDf.printSchema()
+
+finalReport = incReadDf.join(custDf, custDf.CREDIT_CARD_NUMBER == incReadDf.credit_card_number, 'inner')
 
 distanceFunc = F.udf(lambda arr: (((arr[2]-arr[0])**2)+((arr[3]-arr[1])**2)**(1/2)), FloatType())
 distanceDf = finalReport.withColumn("trx_dist_from_home", distanceFunc(F.array("latitude", "longitude",

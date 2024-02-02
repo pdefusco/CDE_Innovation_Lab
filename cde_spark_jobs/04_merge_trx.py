@@ -75,8 +75,8 @@ trxBatchDf = trxBatchDf.withColumn("event_ts", trxBatchDf["event_ts"].cast("time
 #---------------------------------------------------
 
 # Already done in CDE Session Iceberg Part 2:
-#spark.sql("ALTER TABLE {}.TRX_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
-#spark.sql("CALL spark_catalog.system.migrate('{}.TRX_TABLE')".format(username))
+spark.sql("ALTER TABLE {}.TRX_TABLE UNSET TBLPROPERTIES ('TRANSLATED_TO_EXTERNAL')".format(username))
+spark.sql("CALL spark_catalog.system.migrate('{}.TRX_TABLE')".format(username))
 
 #---------------------------------------------------
 #               PARTITION TRX TABLE BY MONTH
