@@ -66,8 +66,12 @@ spark.sql("SELECT COUNT(*) FROM spark_catalog.{}.TRX_TABLE".format(username)).sh
 ```
 
 ```
-# QUERY ICEBERG METADATA
+# QUERY ICEBERG METADATA HISTORY TABLE
 spark.sql("SELECT * FROM spark_catalog.{}.TRX_TABLE.history".format(username)).show(20, False)
+```
+
+```
+# QUERY ICEBERG METADATA HISTORY TABLE
 spark.sql("SELECT * FROM spark_catalog.{}.TRX_TABLE.snapshots".format(username)).show(20, False)
 ```
 
