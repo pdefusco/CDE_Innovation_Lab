@@ -30,7 +30,7 @@ There are three parts to the HOL:
 5. Uplaod the requirements.txt file to the CDE Python resource. The upload can take a few minutes but you can navigate away from the page and start building the next jobs if needed.
 6. Create a CDE Spark Job with the following parameters:
   - Name: name this after your user e.g. if you are user "user010" call it "01_fraud_report_user010"
-  - Application File: "01_fraud_report.py" located in cde_spark_jobs folder
+  - Application File: Select "01_fraud_report.py" from your CDE Files resource
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Configurations: enter "spark.sql.autoBroadcastJoinThreshold" in the key field and "11M" without quotes in the value field
   - Python Environment: choose your CDE Python resource from the dropdown
