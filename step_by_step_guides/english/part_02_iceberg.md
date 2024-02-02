@@ -43,6 +43,8 @@ spark.sql("SELECT COUNT(*) FROM spark_catalog.{}.TRX_TABLE".format(username)).sh
 ```
 # LOAD NEW TRANSACTION BATCH
 trxBatchDf = spark.read.json("{0}/mkthol/trans/{1}/trx_batch.json".format(storageLocation, username))
+trxBatchDf = trxBatchDf.withColumn("event_ts", trxBatchDf["event_ts"].cast('timestamp'))
+trxBatchDf.printSchema()
 trxBatchDf.createOrReplaceTempView("BATCH_TEMP_VIEW".format(username))
 ```
 
