@@ -69,7 +69,11 @@ transactionsDf = renameMultipleColumns(transactionsDf, cols, new_cols)
 
 ### CAST TYPES
 cols = ["transaction_amount", "latitude", "longitude"]
+transactionsDf = castMultipleColumns(transactionsDf, cols)
 transactionsDf = transactionsDf.withColumn("event_ts", transactionsDf["event_ts"].cast("timestamp"))
+
+### TRX DF SCHEMA AFTER CASTING AND RENAMING
+transactionsDf.printSchema()
 
 ### STORE TRANSACTIONS AS TABLE
 spark.sql("DROP DATABASE IF EXISTS {} CASCADE".format(username))
@@ -90,8 +94,10 @@ piiDf.write.mode("overwrite").saveAsTable('{}.CUST_TABLE'.format(username), form
 ### JOIN TWO DATASETS AND COMPARE COORDINATES
 joinDf = spark.sql("""SELECT i.name, i.address_longitude, i.address_latitude, i.bank_country,
           r.credit_card_provider, r.event_ts, r.transaction_amount, r.longitude, r.latitude
-          FROM {}.CUST_TABLE i INNER JOIN {}.TRX_TABLE r
+          FROM {0}.CUST_TABLE i INNER JOIN {0}.TRX_TABLE r
           ON i.credit_card_number == r.credit_card_number;""".format(username))
+print("JOINDF SCHEMA")
+joinDf.printSchema()
 
 ### PANDAS UDF
 import pandas as pd

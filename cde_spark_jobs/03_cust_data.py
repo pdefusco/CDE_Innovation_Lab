@@ -70,11 +70,11 @@ spark.sql("CALL spark_catalog.system.migrate('{}.CUST_TABLE')".format(username))
 #               CREATE REFINED CUSTOMER TABLE
 #---------------------------------------------------
 
-spark.sql("""CREATE TABLE spark_catalog.{}.CUST_TABLE_REFINED
+spark.sql("""CREATE TABLE spark_catalog.{0}.CUST_TABLE_REFINED
                 USING iceberg
                 PARTITIONED BY (BANK_COUNTRY)
                 AS SELECT NAME, EMAIL, BANK_COUNTRY, ACCOUNT_NO, CREDIT_CARD_NUMBER, ADDRESS_LATITUDE, ADDRESS_LONGITUDE
-                FROM spark_catalog.{}.CUST_TABLE""")
+                FROM spark_catalog.{0}.CUST_TABLE""".format(username))
 
 #---------------------------------------------------
 #               SCHEMA EVOLUTION
@@ -82,7 +82,7 @@ spark.sql("""CREATE TABLE spark_catalog.{}.CUST_TABLE_REFINED
 
 # UPDATE TYPES: Updating Latitude and Longitude FROM FLOAT TO DOUBLE
 spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
-                ALTER COLUMN ADDRESS_LATITUDE TYPE double""")
+                ALTER COLUMN ADDRESS_LATITUDE TYPE double""".format(username))
 
 spark.sql("""ALTER TABLE spark_catalog.{}.CUST_TABLE_REFINED
-                ALTER COLUMN ADDRESS_LONGITUDE TYPE double""")
+                ALTER COLUMN ADDRESS_LONGITUDE TYPE double""".format(username))
