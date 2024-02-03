@@ -33,7 +33,6 @@ now = datetime.now()
 timestamp = datetime.timestamp(now)
 
 print("PRE-INSERT TIMESTAMP: ", timestamp)
-PRE-INSERT TIMESTAMP: 1701302029.338524
 ```
 
 ```

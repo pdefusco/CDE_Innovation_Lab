@@ -81,7 +81,7 @@ incReadDf = spark.read\
     .option("end-snapshot-id", last_snapshot)\
     .load("spark_catalog.{}.TRX_TABLE".format(username))
 
-print("Inc Schema:")
+print("Incremental DF Schema:")
 incReadDf.printSchema()
 
 print("Incremental Report:")
