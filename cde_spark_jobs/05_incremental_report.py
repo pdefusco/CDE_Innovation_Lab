@@ -73,11 +73,12 @@ spark.sql("SELECT * FROM {}.TRX_TABLE.snapshots;".format(username)).show()
 snapshots_df = spark.sql("SELECT * FROM {}.TRX_TABLE.snapshots;".format(username))
 
 last_snapshot = snapshots_df.select("snapshot_id").tail(1)[0][0]
-first_snapshot = snapshots_df.select("snapshot_id").head(1)[0][0]
+second_snapshot = snapshots_df.select("snapshot_id").collect()[1][0]
+#first_snapshot = snapshots_df.select("snapshot_id").head(1)[0][0]
 
 incReadDf = spark.read\
     .format("iceberg")\
-    .option("start-snapshot-id", first_snapshot)\
+    .option("start-snapshot-id", second_snapshot)\
     .option("end-snapshot-id", last_snapshot)\
     .load("spark_catalog.{}.TRX_TABLE".format(username))
 

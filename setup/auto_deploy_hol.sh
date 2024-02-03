@@ -28,9 +28,9 @@ cde resource upload --name mkt-hol-setup-$cde_user --local-path setup.py
 
 # CREATE SETUP JOB
 echo "Create job mkt-hol-setup-"$cde_user
-cde job create --name mkt-hol-setup-$cde_user --type spark --arg $max_participants --arg $storage_location --mount-1-resource mkt-hol-setup-$cde_user --application-file setup.py --runtime-image-resource-name dex-spark-runtime-$cde_user
+cde job create --name mkt-hol-setup-$cde_user --type spark --mount-1-resource mkt-hol-setup-$cde_user --application-file setup.py --runtime-image-resource-name dex-spark-runtime-$cde_user
 echo "Run job mkt-hol-setup-"$cde_user
-cde job run --name mkt-hol-setup-$cde_user
+cde job run --name mkt-hol-setup-$cde_user --arg $max_participants --arg $storage_location
 
 echo " "
 echo "."

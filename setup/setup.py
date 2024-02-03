@@ -225,7 +225,7 @@ def savePiiData(piiDf, storageLocation, username):
             .write. \
             mode('overwrite') \
             .options(header='True', delimiter=',') \
-            .csv("{0}/mkthol/pii/{1}/pii.csv".format(storageLocation, username))
+            .csv("{0}/mkthol/pii/{1}/pii".format(storageLocation, username))
     except Exception as e:
         print("SAVING SYNTHETIC TRANSACTION DATA UNSUCCESSFUL")
         print('\n')
