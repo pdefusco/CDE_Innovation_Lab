@@ -117,6 +117,32 @@ class BankDataGen:
         return df
 
 
+    def secondTransactionsBatchDataGen(self, shuffle_partitions_requested = 1, partitions_requested = 1, data_rows = 150):
+
+        # setup use of Faker
+        FakerTextUS = FakerTextFactory(locale=['en_US'], providers=[bank])
+
+        # partition parameters etc.
+        self.spark.conf.set("spark.sql.shuffle.partitions", shuffle_partitions_requested)
+
+        fakerDataspec = (DataGenerator(self.spark, rows=data_rows, partitions=partitions_requested)
+                    .withColumn("credit_card_number", "long", minValue=3174567891199999, maxValue=3174597891199999, uniqueValues=data_rows, random=True) #text=FakerTextUS("credit_card_number")
+                    .withColumn("credit_card_provider", text=FakerTextUS("credit_card_provider"))
+                    .withColumn("transaction_type", "string", values=["purchase", "cash_advance"], random=True, weights=[9, 1])
+                    .withColumn("event_ts", "timestamp", begin="2023-01-01 01:00:00",end="2023-12-31 23:59:00",interval="1 minute", random=True)
+                    .withColumn("longitude", "float", minValue=-125, maxValue=-66.9345, random=True)
+                    .withColumn("latitude", "float", minValue=24.3963, maxValue=49.3843, random=True)
+                    .withColumn("transaction_currency", values=["USD", "EUR", "KWD", "BHD", "GBP", "CHF", "MEX"])
+                    .withColumn("transaction_amount", "decimal", minValue=0.01, maxValue=30000, random=True)
+                    )
+
+        df = fakerDataspec.build()
+        df = df.withColumn("credit_card_number", df["credit_card_number"].cast("string"))
+        df = df.dropDuplicates(['credit_card_number', 'credit_card_provider'])
+
+        return df
+
+
     def piiDataGen(self, shuffle_partitions_requested = 5, partitions_requested = 5, data_rows = 2000):
 
         # setup use of Faker

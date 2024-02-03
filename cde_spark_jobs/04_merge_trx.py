@@ -63,7 +63,7 @@ print("PySpark Runtime Arg: ", sys.argv[1])
 #               LOAD TRX BATCH DATA
 #---------------------------------------------------
 
-trxBatchDf = spark.read.json("{0}/mkthol/trans/{1}/trx_batch.json".format(storageLocation, username))
+trxBatchDf = spark.read.json("{0}/mkthol/trans/{1}/trx_batch_2".format(storageLocation, username))
 
 trxBatchDf = trxBatchDf.withColumn("transaction_amount",  trxBatchDf["transaction_amount"].cast('float'))
 trxBatchDf = trxBatchDf.withColumn("latitude",  trxBatchDf["latitude"].cast('float'))

@@ -18,7 +18,7 @@ username = "user002"
 
 ```
 ### WORKING WITH TRANSACTIONS FACT TABLE
-transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions.json".format(storageLocation, username))
+transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions".format(storageLocation, username))
 transactionsDf.printSchema()
 ```
 ```
@@ -88,7 +88,7 @@ spark.sql("SELECT CREDIT_CARD_NUMBER, COUNT(*) AS COUNT FROM trx \
 
 ```
 ### PII DIMENSION TABLE
-piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii.csv".format(storageLocation, username))
+piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii".format(storageLocation, username))
 piiDf.show()
 piiDf.printSchema()
 ```
@@ -155,7 +155,7 @@ Run the following script to build a report.
 
 ```
 #****************************************************************************
-# (C) Cloudera, Inc. 2020-2023
+# (C) Cloudera, Inc. 2020-2024
 #  All rights reserved.
 #
 #  Applicable Open Source License: GNU Affero General Public License v3.0
@@ -214,7 +214,7 @@ print("PySpark Runtime Arg: ", sys.argv[1])
 
 ### TRANSACTIONS FACT TABLE
 
-transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions.json".format(storageLocation, username))
+transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions".format(storageLocation, username))
 transactionsDf = transactionsDf.select(flatten_struct(transactionsDf.schema))
 transactionsDf.printSchema()
 
@@ -238,7 +238,7 @@ spark.sql("SHOW DATABASES LIKE '{}'".format(username)).show()
 transactionsDf.write.mode("overwrite").saveAsTable('{}.TRX_TABLE'.format(username), format="parquet")
 
 ### PII DIMENSION TABLE
-piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii.csv".format(storageLocation, username))
+piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii".format(storageLocation, username))
 
 ### CAST LAT LON AS FLOAT
 piiDf = piiDf.withColumn("address_latitude",  piiDf["address_latitude"].cast('float'))

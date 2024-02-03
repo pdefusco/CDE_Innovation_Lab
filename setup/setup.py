@@ -106,16 +106,33 @@ def createTransactionBatch(spark):
     """
 
     try:
-        print("CREATING BANKING TRANSACTIONS DF...\n")
+        print("CREATING BANKING TRANSACTIONS 1 DF BATCH...\n")
         dg = BankDataGen(spark)
         transactionsBatchDf = dg.transactionsBatchDataGen()
     except Exception as e:
-        print("CREATING TRANSACTION DATA UNSUCCESSFUL")
+        print("CREATING TRANSACTION DATA 1 UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
 
     return transactionsBatchDf
+
+def createSecondTransactionBatch(spark):
+    """
+    Method to create a Banking Transactions dataframe using the dbldatagen and Faker frameworks
+    """
+
+    try:
+        print("CREATING BANKING TRANSACTIONS 2 BATCH DF...\n")
+        dg = BankDataGen(spark)
+        secondTransactionsBatchDf = dg.secondTransactionsBatchDataGen()
+    except Exception as e:
+        print("CREATING TRANSACTION DATA 2 UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+    return secondTransactionsBatchDf
 
 
 def createPiiData(spark):
@@ -148,7 +165,7 @@ def saveTransactionData(bankTransactionsDf, storageLocation, username):
             write. \
             format("json"). \
             mode("overwrite"). \
-            save("{0}/mkthol/trans/{1}/transactions.json".format(storageLocation, username))
+            save("{0}/mkthol/trans/{1}/transactions".format(storageLocation, username))
     except Exception as e:
         print("SAVING SYNTHETIC TRANSACTION DATA UNSUCCESSFUL")
         print('\n')
@@ -161,16 +178,36 @@ def saveTransactionBatch(transactionsBatchDf, storageLocation, username):
     Method to save banking transactions to Cloud Storage in Json format
     """
 
-    print("SAVING TRANSACTIONS BATCH TO JSON IN CLOUD STORAGE...\n")
+    print("SAVING TRANSACTIONS BATCH 1 TO JSON IN CLOUD STORAGE...\n")
 
     try:
         transactionsBatchDf. \
             write. \
             format("json"). \
             mode("overwrite"). \
-            save("{0}/mkthol/trans/{1}/trx_batch.json".format(storageLocation, username))
+            save("{0}/mkthol/trans/{1}/trx_batch_1".format(storageLocation, username))
     except Exception as e:
-        print("SAVING TRANSACTION BATCH UNSUCCESSFUL")
+        print("SAVING TRANSACTION BATCH 1 UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+
+def saveSecondTransactionBatch(secondTransactionsBatchDf, storageLocation, username):
+    """
+    Method to save banking transactions to Cloud Storage in Json format
+    """
+
+    print("SAVING TRANSACTIONS BATCH 2 TO JSON IN CLOUD STORAGE...\n")
+
+    try:
+        secondTransactionsBatchDf. \
+            write. \
+            format("json"). \
+            mode("overwrite"). \
+            save("{0}/mkthol/trans/{1}/trx_batch_2".format(storageLocation, username))
+    except Exception as e:
+        print("SAVING TRANSACTION BATCH 2 UNSUCCESSFUL")
         print('\n')
         print(f'caught {type(e)}: e')
         print(e)
@@ -220,6 +257,9 @@ def main():
 
         transactionsBatchDf = createTransactionBatch(spark)
         saveTransactionBatch(transactionsBatchDf, storageLocation, username)
+
+        secondTransactionsBatchDf = createSecondTransactionBatch(spark)
+        saveSecondTransactionBatch(secondTransactionsBatchDf, storageLocation, username)
 
 
 if __name__ == "__main__":

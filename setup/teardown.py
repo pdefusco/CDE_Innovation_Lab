@@ -1,5 +1,5 @@
 #****************************************************************************
-# (C) Cloudera, Inc. 2020-2024
+# (C) Cloudera, Inc. 2020-2023
 #  All rights reserved.
 #
 #  Applicable Open Source License: GNU Affero General Public License v3.0
@@ -37,40 +37,81 @@
 # #  Author(s): Paul de Fusco
 #***************************************************************************/
 
+from os.path import exists
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
-from pyspark.sql.types import *
 import sys, random, os, json, random, configparser
-from great_expectations.dataset.sparkdf_dataset import SparkDFDataset
 
-spark = SparkSession \
-    .builder \
-    .appName("DATA VALIDATION") \
-    .getOrCreate()
+## CDE PROPERTIES
 
-config = configparser.ConfigParser()
-config.read('/app/mount/parameters.conf')
-storageLocation=config.get("general","data_lake_name")
-print("Storage Location from Config File: ", storageLocation)
+def parseProperties():
+    """
+    Method to parse total number of HOL participants argument
+    """
+    try:
+        print("PARSING JOB ARGUMENTS...")
+        maxParticipants = sys.argv[1]
+    except Exception as e:
+        print("READING JOB ARG UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
 
-username = sys.argv[1]
-print("PySpark Runtime Arg: ", sys.argv[1])
+    return maxParticipants
 
-#---------------------------------------------------
-#               LOAD BATCH DATA
-#---------------------------------------------------
 
-trxBatchDf = spark.read.json("{0}/mkthol/trans/{1}/trx_batch_2".format(storageLocation, username))
+def createSparkSession():
+    """
+    Method to create an Iceberg Spark Session
+    """
 
-#---------------------------------------------------
-#               VALIDATE BATCH DATA
-#---------------------------------------------------
+    try:
+        spark = SparkSession \
+            .builder \
+            .appName("BANK TRANSACTIONS LOAD") \
+            .getOrCreate()
+    except Exception as e:
+        print("LAUNCHING SPARK SESSION UNSUCCESSFUL")
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
 
-# validate the data quality of the sales data with great-expectations
-geTrxBatchDf = SparkDFDataset(trxBatchDf)
+    return spark
 
-geTrxBatchDfValidation = geTrxBatchDf.expect_compound_columns_to_be_unique(["credit_card_number", "credit_card_provider"])
 
-print(f"VALIDATION RESULTS FOR TRANSACTION BATCH DATA:\n{geTrxBatchDfValidation}\n")
-assert geTrxBatchDfValidation.success, \
-    "VALIDATION FOR SALES TABLE UNSUCCESSFUL: FOUND DUPLICATES IN [credit_card_number, credit_card_provider]."
+def dropDatabase(spark, username):
+    """
+    Method to drop database for provided user
+    """
+
+    try:
+        print("DROP DB CASCADE: {}".format(username))
+        spark.sql("DROP DATABASE IF EXISTS {} CASCADE".format(username))
+    except Exception as e:
+        print("DROP {} DB UNSUCCESSFUL".format(username))
+        print('\n')
+        print(f'caught {type(e)}: e')
+        print(e)
+
+
+def main():
+
+    maxParticipants = parseProperties()
+
+    spark = createSparkSession()
+
+    for i in range(int(maxParticipants)):
+        if i+1 < 10:
+            username = "user00" + str(i+1)
+        elif i+1 > 9 & i+1 < 99:
+            username = "user0" + str(i+1)
+        elif i+1 > 99:
+            username = "user" + str(i+1)
+
+        print("PROCESSING USER {}...\n".format(username))
+
+        dropDatabase(spark, username)
+
+
+if __name__ == "__main__":
+    main()
