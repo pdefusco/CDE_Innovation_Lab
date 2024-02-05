@@ -6,7 +6,7 @@ You can explore data interactively in CDE Sessions.
 
 Navigate to the CDE Home Page and launch a PySPark Session:
 
-![alt text](../../img/cde_thankyou.png)
+![alt text](../img/cde_thankyou.png)
 
 
 
