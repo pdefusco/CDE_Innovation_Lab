@@ -51,7 +51,7 @@ In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is i
 
 4. Incremental Report:
   - Name: name this after your user e.g. if you are user "user010" call it "05_inc_report_user010"
-  - Application File: "04_incremental_report.py" located in your CDE Files resource.
+  - Application File: "05_incremental_report.py" located in your CDE Files resource.
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
   - Leave all other settings to default values and run the job.  
