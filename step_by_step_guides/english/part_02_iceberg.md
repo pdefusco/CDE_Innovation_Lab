@@ -3,7 +3,7 @@
 * [A Brief Introduction to Apache Iceberg](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#a-brief-introduction-to-apache-iceberg)
 * [Lab 1: Working with Iceberg in CDE Sessions](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#lab-1-working-with-iceberg-in-cde-sessions)
 * [Summary](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#summary)
-* [Useful Links and Resources](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#references)
+* [Useful Links and Resources](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#useful-links-and-resources)
 
 ### A Brief Introduction to Apache Iceberg
 

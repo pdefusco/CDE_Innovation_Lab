@@ -3,7 +3,7 @@
 * [A Brief Introduction to Apache Airflow](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#a-brief-introduction-to-airflow)
 * [Lab 1: Orchestrate Spark Pipeline with Airflow](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#lab-1-orchestrate-spark-pipeline-with-airflow)
 * [Summary](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#summary)
-* [Useful Links and Resources]()
+* [Useful Links and Resources](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#useful-links-and-resources)
 
 ### A Brief Introduction to Airflow
 
@@ -85,7 +85,6 @@ While the job is in-flight open the Airflow UI and monitor execution.
 ![alt text](../../img/part3-cdeairflowjob-3.png)
 
 ![alt text](../../img/part3-cdeairflowjob-4.png)
-
 
 ### Summary
 
