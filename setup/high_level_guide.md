@@ -77,10 +77,4 @@ Create but DO NOT RUN the following CDE Spark Jobs:
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
   - Leave all other settings to default values and run the job.  
 
-Finally, create a CDE Airflow Job in the Airflow Editor.
-  - Create CDE Jobs with 02_data_val_user0xx and 03_cust_data_user0xx on the left the canvas.
-  - Create CDE Jobs for 04_merge_trx_user0xx and 05_inc_report_user0xx on the right side of the canvas.
-  - Point 02_data_val_user0xx to 04_merge_trx_user0xx
-  - Point 04_merge_trx_user0xx to 05_inc_report_user0xx
-  - Point 03_cust_data_user0xx to 05_inc_report_user0xx
-  - Run the pipeline and validate job output in the Job Runs UI
+Finally, create a CDE Airflow Job with the DAG provided in cde_airflow_jobs.

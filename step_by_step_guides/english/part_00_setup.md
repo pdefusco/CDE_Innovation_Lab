@@ -4,7 +4,6 @@
 
 This git repository hosts the automation for a CDE Demo that includes Spark, Airflow and Iceberg. The Demo is deployed and removed in your Virtual Cluster within minutes.
 
-
 ## Table of Contents
 
 * [Requirements](https://github.com/pdefusco/CDE_Demo_Auto_Deploy#requirements)

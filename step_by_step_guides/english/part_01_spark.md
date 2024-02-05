@@ -1,8 +1,12 @@
-# Part 1: Spark in CDE
+# Part 1: Apache Spark in CDE
+
+### A Brief Introduction to Spark
+
+Apache Spark is an open-source, distributed processing system used for big data workloads. It has gained extreme popularity as the go-to engine for interactive Data Analysis and the deployment of Production Data Engineering and Machine Learning pipelines at scale.
+
+In CDE you can use Spark to explore data interactively via CDE Sessions or deploy batch data engineering pipelines via CDE Jobs.
 
 ### Lab 1: Run PySpark Interactive Session
-
-You can explore data interactively in CDE Sessions.
 
 Navigate to the CDE Home Page and launch a PySpark Session. Leave default settings intact.
 
@@ -269,4 +273,3 @@ If you are curious to learn more about the above features in the context of more
 * [Working with CDE Spark Job Parameters in Cloudera Data Engineering](https://community.cloudera.com/t5/Community-Articles/Working-with-CDE-Spark-Job-Parameters-in-Cloudera-Data/ta-p/380792)
 * [How to parse XMLs in CDE with the Spark XML Package](https://community.cloudera.com/t5/Community-Articles/How-to-parse-XMLs-in-Cloudera-Data-Engineering-with-the/ta-p/379451)
 * [Spark Geospatial with Apache Sedona in CDE](https://community.cloudera.com/t5/Community-Articles/Spark-Geospatial-with-Apache-Sedona-in-Cloudera-Data/ta-p/378086)
-* [Enterprise Data Quality at Scale in CDE with Great Expectations and CDE Custom Runtimes](https://community.cloudera.com/t5/Community-Articles/Enterprise-Data-Quality-at-Scale-with-Spark-and-Great/ta-p/378161)
