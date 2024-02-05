@@ -1,5 +1,7 @@
 # Part 1: Apache Spark in CDE
 
+
+
 ### A Brief Introduction to Spark
 
 Apache Spark is an open-source, distributed processing system used for big data workloads. It has gained extreme popularity as the go-to engine for interactive Data Analysis and the deployment of Production Data Engineering and Machine Learning pipelines at scale.
