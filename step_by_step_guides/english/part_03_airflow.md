@@ -1,6 +1,9 @@
 # Part 3: Apache Airflow in CDE
 
-
+* [A Brief Introduction to Apache Airflow](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
+* [Lab 1: Orchestrate Spark Pipeline with Airflow](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
+* [Summary]()
+* [Useful Links and Resources]()
 
 ### A Brief Introduction to Airflow
 
@@ -19,7 +22,7 @@ At a high level, the workflow will be similar to Part 1 and 2 where you created 
 1. The workflow will leverage all the features used up to this point but in unison. For example, Iceberg Time Travel will be used to create an incremental report including only updates within the latest batch rather than the entire historical dataset.
 2. The entire workflow will be orchestrated by Airflow. This will allow you to run your jobs in parallel while implementing robust error handling logic.
 
-##### Create CDE Spark Jobs
+##### Create Spark Jobs
 
 In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is important that you do not run the Spark Jobs when you create them. If you do run them by mistake, please raise your hand during the workshop and ask for someone to help you implement a workaround.
 

@@ -1,5 +1,10 @@
 # Part 2: Apache Iceberg in CDE
 
+* [A Brief Introduction to Apache Iceberg](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
+* [Lab 1: Working with Iceberg in CDE Sessions](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
+* [Summary]()
+* [Useful Links and Resources]()
+
 ### A Brief Introduction to Apache Iceberg
 
 Apache Iceberg is a cloud-native, high-performance open table format for organizing petabyte-scale analytic datasets on a file system or object store. Combined with Cloudera Data Platform (CDP), users can build an open data lakehouse architecture for multi-function analytics and to deploy large scale end-to-end pipelines.

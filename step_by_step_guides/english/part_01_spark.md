@@ -1,6 +1,10 @@
 # Part 1: Apache Spark in CDE
 
-
+* [A Brief Introduction to Spark](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
+* [Lab 1: Run PySpark Interactive Session](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
+* [Lab 2: Create CDE Resources and Run CDE Spark Job](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cde-service)
+* [Summary]()
+* [Useful Links and Resources]()
 
 ### A Brief Introduction to Spark
 
@@ -266,7 +270,7 @@ In order to improve performance you translated the PySpark UDF into a Pandas UDF
 
 Finally, you ran the job and observed outputs in the CDE Job Runs page. CDE stored Job Runs, logs, and associated CDE Resources for each run. This provided you real time job monitoring and troubleshooting capabilities, along with post-execution storage of logs, run dependencies, and cluster information.
 
-### Useful References
+### Useful Links and Resources
 
 If you are curious to learn more about the above features in the context of more advanced use cases, please visit the following references:
 
