@@ -51,7 +51,7 @@ In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is i
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
   - Leave all other settings to default values and run the job.  
 
-![alt text](../../img/part3-cdeairflowjob-1.png)
+![alt text](../../img/part3-cdesparkjob-1.png)
 
 ##### Create Airflow Job
 
@@ -68,6 +68,8 @@ Open the "airflow_dag.py" script located in the "cde_airflow_jobs" folder. Famil
 Edit the username variable at line 49. Then navigate to the CDE Jobs UI and create a new CDE Job.
 
 Select Airflow as the Job Type, assign a unique CDE Job name based on your user, and then run the Job.  
+
+![alt text](../../img/part3-cdeairflowjob-1.png)
 
 ![alt text](../../img/part3-cdeairflowjob-2.png)
 
