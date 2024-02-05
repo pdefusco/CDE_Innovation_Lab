@@ -1,6 +1,6 @@
-# Build a Spark Job
+# Part 1: Spark in CDE
 
-### CDE Sessions
+### Lab 1: Run PySpark Interactive Session
 
 You can explore data interactively in CDE Sessions.
 
@@ -162,106 +162,111 @@ distanceDf = joinDf.withColumn("trx_dist_from_home", distanceFunc(F.array("latit
 distanceDf.filter(distanceDf.trx_dist_from_home > 100).show()
 ```
 
-### CDE Spark Jobs
+### Lab 2: Create CDE Resources and Run CDE Spark Job
 
-You have used Sessions to interactively explore data. CDE also allows you to run Spark Application code in batch with as a CDE Job. There are two types of CDE Jobs: Spark and Airflow. In this lab we will create a CDE Spark Job and revisit Airflow later in part 3. 
+Up until now you used Sessions to interactively explore data. CDE also allows you to run Spark Application code in batch with as a CDE Job. There are two types of CDE Jobs: Spark and Airflow. In this lab we will create a CDE Spark Job and revisit Airflow later in part 3.
 
-The CDE Spark Job is an abstraction over the Spark Submit. With the CDE Spark Job you can create a reusable, modular Spark Submit definition that can be modified before every run according to your needs.
+The CDE Spark Job is an abstraction over the Spark Submit. With the CDE Spark Job you can create a reusable, modular Spark Submit definition that is saved in CDE and can be modified in the CDE UI (or via the CDE CLI and API) before every run according to your needs. CDE stores the job definition for each run in the Job Runs UI so you can go back and refer to it long after your job has completed.
 
+Furthermore, CDE allows you to directly store artifacts such as Python files, Jars and other dependencies, or create Python environments and Docker containers in CDE as "CDE Resources". Once created in CDE, Resources are available to CDE Jobs as modular components of the CDE Job definition which can be swapped and referenced by a particular job run as needed.
 
-provide an abstraction
+These features dramatically reduce the amount of work and effort normally required to manage and monitor Spark Jobs in a Spark Cluster. By providing a unified view over all your runs along with the associated artifacts and dependencies, CDE streamlines CI/CD pipelines and removes the need for glue code in your Spark cluster.
 
+In the next steps we will see these benefits in actions.
 
- but CDE Spark Jobs provide many benefits (insert benefits here).
+##### Create CDE Python Resource
 
-Before running the following script:
-1. Create a CDE Files Resource
-2. Upload Script and Dependencies
-3. Create a Python Resource and upload requirements.txt
+Navigate to the Resources tab and create a Python Resource. Make sure to select the Virtual Cluster assigned to you if you are creating a Resource from the CDE Home Page, and to name the Python Resource after your username e.g. "fraud-prevention-py-user100" if you are "user100".
 
-Run the following script to build a report.
+Upload the "requirements.txt" file located in the "cde_spark_jobs" folder. This can take up to a few minutes.
 
-```
-from pyspark.sql import SparkSession
-import pyspark.sql.functions as F
-from pyspark.sql.types import *
-import sys, random, os, json, random, configparser
-from utils import *
+Please familiarize yourself with the contents of the "requirements.txt" file and notice that it contains a few Python libraries such as Pandas and PyArrow.
 
-spark = SparkSession \
-    .builder \
-    .appName("BANK TRANSACTIONS BATCH REPORT") \
-    .getOrCreate()
+Then, move on to the next section even while the environment build is still in progress.
 
-config = configparser.ConfigParser()
-config.read('/app/mount/parameters.conf')
-storageLocation=config.get("general","data_lake_name")
-print("Storage Location from Config File: ", storageLocation)
+![alt text](../../img/part1-cdepythonresource-1.png)
 
-username = sys.argv[1]
-print("PySpark Runtime Arg: ", sys.argv[1])
+![alt text](../../img/part1-cdepythonresource-2.png)
 
-### TRANSACTIONS FACT TABLE
+##### Create CDE Files Resource
 
-transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions".format(storageLocation, username))
-transactionsDf = transactionsDf.select(flatten_struct(transactionsDf.schema))
-transactionsDf.printSchema()
+From the Resources page create a CDE Files Resource. Upload all files contained in the "cde_spark_jobs" folder. Again, ensure the Resource is named after your unique workshop username and it is created in the Virtual Cluster assigned to you.
 
-### RENAME MULTIPLE COLUMNS
-cols = [col for col in transactionsDf.columns if col.startswith("transaction")]
-new_cols = [col.split(".")[1] for col in cols]
-transactionsDf = renameMultipleColumns(transactionsDf, cols, new_cols)
+![alt text](../../img/part1-cdefilesresource-1.png)
 
-### CAST TYPES
-cols = ["transaction_amount", "latitude", "longitude"]
-transactionsDf = castMultipleColumns(transactionsDf, cols)
-transactionsDf = transactionsDf.withColumn("event_ts", transactionsDf["event_ts"].cast("timestamp"))
+![alt text](../../img/part1-cdefilesresource-2.png)
 
-### TRX DF SCHEMA AFTER CASTING AND RENAMING
-transactionsDf.printSchema()
+Before moving on to the next step, please familiarize yourself with the code in the "01_fraud_report.py", "utils.py", and "parameters.conf" files.
 
-### STORE TRANSACTIONS AS TABLE
-spark.sql("DROP DATABASE IF EXISTS {} CASCADE".format(username))
-spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(username))
-spark.sql("SHOW DATABASES LIKE '{}'".format(username)).show()
-transactionsDf.write.mode("overwrite").saveAsTable('{}.TRX_TABLE'.format(username), format="parquet")
+Notice that "01_fraud_report.py" contains the same PySpark Application code you ran in the CDE Session, with the exception that the column casting and renaming steps have been refactored into Python functions in the "utils.py" script.
 
-### PII DIMENSION TABLE
-piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii".format(storageLocation, username))
+Finally, notice the contents of "parameters.conf". Storing variables in a file in a Files Resource is one method used by CDE Data Engineers to dynamically parameterize scripts with external values.
 
-### CAST LAT LON AS FLOAT
-piiDf = piiDf.withColumn("address_latitude",  piiDf["address_latitude"].cast('float'))
-piiDf = piiDf.withColumn("address_longitude",  piiDf["address_longitude"].cast('float'))
+##### Create CDE Spark Job
 
-### STORE CUSTOMER DATA AS TABLE
-piiDf.write.mode("overwrite").saveAsTable('{}.CUST_TABLE'.format(username), format="parquet")
+Now that the CDE Resources have been created you are ready to create your first CDE Spark Job.
 
-### JOIN TWO DATASETS AND COMPARE COORDINATES
-joinDf = spark.sql("""SELECT i.name, i.address_longitude, i.address_latitude, i.bank_country,
-          r.credit_card_provider, r.event_ts, r.transaction_amount, r.longitude, r.latitude
-          FROM {0}.CUST_TABLE i INNER JOIN {0}.TRX_TABLE r
-          ON i.credit_card_number == r.credit_card_number;""".format(username))
+Navigate to the CDE Jobs tab and click on "Create Job". The long form loaded to the page allows you to build a Spark Submit as a CDE Spark Job, step by step.
 
-print("JOINDF SCHEMA")
-joinDf.printSchema()
+![alt text](../../img/part1-cdesparkjob-1.png)
 
-### PANDAS UDF
-import pandas as pd
-from pyspark.sql.functions import pandas_udf
-from pyspark.sql.types import FloatType
+Enter the following values without quotes into the corresponding fields. Make sure to update the username with your assigned user wherever needed:
 
-# Method for Euclidean Distance
-def euclidean_dist(x1: pd.Series, x2: pd.Series, y1: pd.Series, y2: pd.Series) -> pd.Series:
-   return ((x2-x1)**2)+((y2-y1)**2).pow(1./2)
+* Job Type: Spark
+* Name: 01_fraud_report_userxxx
+* File: Select from Resource -> "01_fraud_report.py"
+* Arguments: userxxx
+* Configurations:
+  - key: spark.sql.autoBroadcastJoinThreshold
+  - value: 11M
 
-# Saving Method as Pandas UDF
-eu_dist = pandas_udf(euclidean_dist, returnType=FloatType())
+The form should now look similar to this:
 
-# Applying UDF on joinDf
-eucDistDf = joinDf.withColumn("DIST_FROM_HOME", eu_dist(F.col("address_longitude"), \
-                                      F.col("longitude"), F.col("address_latitude"), \
-                                       F.col("latitude")))
+![alt text](../../img/part1-cdesparkjob-2.png)
 
-# SELECT CUSTOMERS WHERE TRANSACTION OCCURRED MORE THAN 100 MILES FROM HOME
-eucDistDf.filter(eucDistDf.DIST_FROM_HOME > 100).show()
-```
+Finally, open the "Advanced Options" section.
+
+Notice that your CDE Files Resource has already been mapped to the CDE Job for you.
+
+Then, update the Compute Options by increasing "Executor Cores" and "Executor Memory" from 1 to 2.
+
+![alt text](../../img/part1-cdesparkjob-3.png)
+
+Finally, run the CDE Job by clicking the "Create and Run" icon.
+
+##### CDE Job Run Observability
+
+Navigate to the Job Runs page in your Virtual Cluster and notice a new Job Run is being logged automatically for you.
+
+![alt text](../../img/part1-cdesparkjob-4.png)
+
+Once the run completes, open the run details by clicking on the Run ID integer in the Job Runs page.
+
+![alt text](../../img/part1-cdesparkjob-5.png)
+
+Open the logs tab and validate output from the Job Run in the Driver -> Stdout tab.
+
+![alt text](../../img/part1-cdesparkjob-6.png)
+
+### Summary
+
+In this section you first explored two datasets interactively with CDE Interactive sessions. This feature allowed you to run ad-hoc queries on large, structured and unstructured data, and prototype Spark Application code for batch execution.
+
+Then, you created a batch Spark Job to turned your application prototype into scheduled execution.
+
+In the process, you improved your code for reusability by modularizing your logic into functions, and stored those functions as a utils script in a CDE Files Resource. You also leveraged your Files Resource by storing dynamic variables in a parameters configurations file and applying a runtime variable via the Arguments field. In the context of more advanced Spark CI/CD pipelines both the parameters file and the Arguments field can be overwritten and overridden at runtime.
+
+In order to improve performance you translated the PySpark UDF into a Pandas UDF. You created a CDE Python Resource and attached it to the CDE Job Definition in order to use Pandas and other Python libraries in your PySpark job.
+
+Finally, you ran the job and observed outputs in the CDE Job Runs page. CDE stored Job Runs, logs, and associated CDE Resources for each run. This provided you real time job monitoring and troubleshooting capabilities, along with post-execution storage of logs, run dependencies, and cluster information.
+
+### Useful References
+
+If you are curious to learn more about the above features in the context of more advanced use cases, please visit the following references:
+
+* [Working with CDE Files Resources](https://community.cloudera.com/t5/Community-Articles/Working-with-CDE-Files-Resources/ta-p/379891)
+* [Efficiently Monitoring Jobs, Runs, and Resources with the CDE CLI](https://community.cloudera.com/t5/Community-Articles/Efficiently-Monitoring-Jobs-Runs-and-Resources-with-the-CDE/ta-p/379893)
+* [Working with CDE Spark Job Parameters in Cloudera Data Engineering](https://community.cloudera.com/t5/Community-Articles/Working-with-CDE-Spark-Job-Parameters-in-Cloudera-Data/ta-p/380792)
+* [How to parse XMLs in CDE with the Spark XML Package](https://community.cloudera.com/t5/Community-Articles/How-to-parse-XMLs-in-Cloudera-Data-Engineering-with-the/ta-p/379451)
+* [Spark Geospatial with Apache Sedona in CDE](https://community.cloudera.com/t5/Community-Articles/Spark-Geospatial-with-Apache-Sedona-in-Cloudera-Data/ta-p/378086)
+* [Enterprise Data Quality at Scale in CDE with Great Expectations and CDE Custom Runtimes](https://community.cloudera.com/t5/Community-Articles/Enterprise-Data-Quality-at-Scale-with-Spark-and-Great/ta-p/378161)
