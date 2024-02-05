@@ -4,13 +4,19 @@
 
 You can explore data interactively in CDE Sessions.
 
-Navigate to the CDE Home Page and launch a PySPark Session:
+Navigate to the CDE Home Page and launch a PySpark Session. Leave default settings intact.
 
 ![alt text](../../img/part1-cdesession-1.png)
 
+Once the Session is ready, open the "Interact" tab in order to enter your code.
 
+![alt text](../../img/part1-cdesession-2.png)
 
- and run the following commands:
+You can copy and paste code from the instructions into the notebook by clicking on the icon at the top right of the code cell.
+
+![alt text](../../img/part1-cdesession-3.png)
+
+Copy the following cell into the notebook. Before running it, ensure that you have edited the "username" variable with your assigned user.
 
 ```
 from os.path import exists
@@ -22,13 +28,18 @@ storageLocation = "s3a://cde-innovation-buk-9e384927/data"
 username = "user002"
 ```
 
+![alt text](../../img/part1-cdesession-4.png)
+
+No more code edits are required. Continue running each code snippet below in separate cells in the notebook.
+
 ```
-### WORKING WITH TRANSACTIONS FACT TABLE
+### LOAD HISTORICAL TRANSACTIONS FILE FROM CLOUD STORAGE
 transactionsDf = spark.read.json("{0}/mkthol/trans/{1}/transactions".format(storageLocation, username))
 transactionsDf.printSchema()
 ```
+
 ```
-# Takes in a StructType schema object and return a column selector that flattens the Struct
+### CREATE PYTHON FUNCTION TO FLATTEN PYSPARK DATAFRAME NESTED STRUCTS
 def flatten_struct(schema, prefix=""):
     result = []
     for elem in schema:
@@ -40,27 +51,30 @@ def flatten_struct(schema, prefix=""):
 ```
 
 ```
-# FLATTEN NESTED STRUCT
+### RUN PYTHON FUNCTION TO FLATTEN NESTED STRUCTS AND VALIDATE NEW SCHEMA
 transactionsDf = transactionsDf.select(flatten_struct(transactionsDf.schema))
 transactionsDf.printSchema()
 ```
+
 ```
-# RENAME COLS
+### RENAME COLUMNS
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_amount", "transaction_amount")
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_currency", "transaction_currency")
 transactionsDf = transactionsDf.withColumnRenamed("transaction.transaction_type", "transaction_type")
 transactionsDf = transactionsDf.withColumnRenamed("transaction_geolocation.latitude", "latitude")
 transactionsDf = transactionsDf.withColumnRenamed("transaction_geolocation.longitude", "longitude")
 ```
+
 ```
-# CAST TYPES
+### CAST COLUMN TYPES FROM STRING TO APPROPRIATE TYPE
 transactionsDf = transactionsDf.withColumn("transaction_amount",  transactionsDf["transaction_amount"].cast('float'))
 transactionsDf = transactionsDf.withColumn("latitude",  transactionsDf["latitude"].cast('float'))
 transactionsDf = transactionsDf.withColumn("longitude",  transactionsDf["longitude"].cast('float'))
+transactionsDf = transactionsDf.withColumn("event_ts", transactionsDf["event_ts"].cast("timestamp"))
 ```
 
 ```
-### ANALYTICS ON TRANSACTIONS FACT TABLE ###
+### CALCULATE MEAN AND MEDIAN CREDIT CARD TRANSACTION AMOUNT
 transactionsAmountMean = round(transactionsDf.select(F.mean("transaction_amount")).collect()[0][0],2)
 transactionsAmountMedian = round(transactionsDf.stat.approxQuantile("transaction_amount", [0.5], 0.001)[0],2)
 
@@ -69,88 +83,96 @@ print("Transaction Amount Median: ", transactionsAmountMedian)
 ```
 
 ```
-#transactionsDf.select("event_ts")
+### CREATE SPARK TEMPORARY VIEW FROM DATAFRAME
 transactionsDf.createOrReplaceTempView("trx")
 spark.sql("SELECT * FROM trx LIMIT 10").show()
 ```
 
 ```
-# average transaction amount by month
+### CALCULATE AVERAGE TRANSACTION AMOUNT BY MONTH
 spark.sql("SELECT MONTH(event_ts) AS month, \
           avg(transaction_amount) FROM trx GROUP BY month ORDER BY month").show()
 ```
 
 ```
-# Average transaction amount by day of week
+### CALCULATE AVERAGE TRANSACTION AMOUNT BY DAY OF WEEK
 spark.sql("SELECT DAYOFWEEK(event_ts) AS DAYOFWEEK, \
           avg(transaction_amount) FROM trx GROUP BY DAYOFWEEK ORDER BY DAYOFWEEK").show()
 ```
 
 ```
-# Number of transactions by credit card
+### CALCULATE NUMBER OF TRANSACTIONS BY CREDIT CARD
 spark.sql("SELECT CREDIT_CARD_NUMBER, COUNT(*) AS COUNT FROM trx \
             GROUP BY CREDIT_CARD_NUMBER ORDER BY COUNT DESC LIMIT 10").show()
 ```
 
 ```
-### PII DIMENSION TABLE
+### LOAD CUSTOMER PII DATA FROM CLOUD STORAGE
 piiDf = spark.read.options(header='True', delimiter=',').csv("{0}/mkthol/pii/{1}/pii".format(storageLocation, username))
 piiDf.show()
 piiDf.printSchema()
 ```
 
 ```
-### CAST LAT LON AS FLOAT
+### CAST LAT LON TO FLOAT TYPE AND CREATE TEMPORARY VIEW
 piiDf = piiDf.withColumn("address_latitude",  piiDf["address_latitude"].cast('float'))
 piiDf = piiDf.withColumn("address_longitude",  piiDf["address_longitude"].cast('float'))
 piiDf.createOrReplaceTempView("cust_info")
 ```
 
 ```
-# TOP 100 customers with multiple credit cards, sorted by highest to lowest
+### SELECT TOP 100 CUSTOMERS WITH MULTIPLE CREDIT CARDS SORTED BY NUMBER OF CREDIT CARDS FROM HIGHEST TO LOWEST
 spark.sql("SELECT name AS name, \
           COUNT(credit_card_number) AS CC_COUNT FROM cust_info GROUP BY name ORDER BY CC_COUNT DESC \
           LIMIT 100").show()
 ```
 
 ```
-# TOP 100 credit cards with multiple names, sorted by highest to lowest
+### SELECT TOP 100 CREDIT CARDS WITH MULTIPLE NAMES SORTED FROM HIGHEST TO LOWEST
 spark.sql("SELECT COUNT(name) AS NM_COUNT, \
           credit_card_number AS CC_NUM FROM cust_info GROUP BY CC_NUM ORDER BY NM_COUNT DESC \
           LIMIT 100").show()
 ```
 
 ```
-# TOP 25 customers with multiple addresses, sorted by highest to lowest
+# SELECT TOP 25 CUSTOMERS WITH MULTIPLE ADDRESSES SORTED FROM HIGHEST TO LOWEST
 spark.sql("SELECT name AS name, \
           COUNT(address) AS ADD_COUNT FROM cust_info GROUP BY name ORDER BY ADD_COUNT DESC \
           LIMIT 25").show()
 ```
 
 ```
-### OPTIONAL: ADD A MORE ADVANCED QUERY E.G. WINDOWING
-
-### JOIN TWO DATASETS AND COMPARE COORDINATES
+### JOIN DATASETS AND COMPARE CREDIT CARD OWNER COORDINATES WITH TRANSACTION COORDINATES
 joinDf = spark.sql("""SELECT i.name, i.address_longitude, i.address_latitude, i.bank_country,
           r.credit_card_provider, r.event_ts, r.transaction_amount, r.longitude, r.latitude
           FROM cust_info i INNER JOIN trx r
           ON i.credit_card_number == r.credit_card_number;""")
 joinDf.show()
 ```
+
 ```
+### CREATE PYSPARK UDF TO CALCULATE DISTANCE BETWEEN TRANSACTION AND HOME LOCATIONS
 distanceFunc = F.udf(lambda arr: (((arr[2]-arr[0])**2)+((arr[3]-arr[1])**2)**(1/2)), FloatType())
 distanceDf = joinDf.withColumn("trx_dist_from_home", distanceFunc(F.array("latitude", "longitude",
                                                                             "address_latitude", "address_longitude")))
 ```
 
 ```
-# SELECT CUSTOMERS WHERE TRANSACTION OCCURRED MORE THAN 100 MILES FROM HOME
+### SELECT CUSTOMERS WHOSE TRANSACTION OCCURRED MORE THAN 100 MILES FROM HOME
 distanceDf.filter(distanceDf.trx_dist_from_home > 100).show()
 ```
 
 ### CDE Spark Jobs
 
-You have used Sessions to interactively explore data, but CDE Spark Jobs provide many benefits (insert benefits here).
+You have used Sessions to interactively explore data. CDE also allows you to run Spark Application code in batch with as a CDE Job. There are two types of CDE Jobs: Spark and Airflow. In this lab we will create a CDE Spark Job and revisit Airflow later in part 3. 
+
+The CDE Spark Job is an abstraction over the Spark Submit. With the CDE Spark Job you can create a reusable, modular Spark Submit definition that can be modified before every run according to your needs.
+
+
+provide an abstraction
+
+
+ but CDE Spark Jobs provide many benefits (insert benefits here).
 
 Before running the following script:
 1. Create a CDE Files Resource
@@ -160,45 +182,6 @@ Before running the following script:
 Run the following script to build a report.
 
 ```
-#****************************************************************************
-# (C) Cloudera, Inc. 2020-2024
-#  All rights reserved.
-#
-#  Applicable Open Source License: GNU Affero General Public License v3.0
-#
-#  NOTE: Cloudera open source products are modular software products
-#  made up of hundreds of individual components, each of which was
-#  individually copyrighted.  Each Cloudera open source product is a
-#  collective work under U.S. Copyright Law. Your license to use the
-#  collective work is as provided in your written agreement with
-#  Cloudera.  Used apart from the collective work, this file is
-#  licensed for your use pursuant to the open source license
-#  identified above.
-#
-#  This code is provided to you pursuant a written agreement with
-#  (i) Cloudera, Inc. or (ii) a third-party authorized to distribute
-#  this code. If you do not have a written agreement with Cloudera nor
-#  with an authorized and properly licensed third party, you do not
-#  have any rights to access nor to use this code.
-#
-#  Absent a written agreement with Cloudera, Inc. (“Cloudera”) to the
-#  contrary, A) CLOUDERA PROVIDES THIS CODE TO YOU WITHOUT WARRANTIES OF ANY
-#  KIND; (B) CLOUDERA DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED
-#  WARRANTIES WITH RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO
-#  IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND
-#  FITNESS FOR A PARTICULAR PURPOSE; (C) CLOUDERA IS NOT LIABLE TO YOU,
-#  AND WILL NOT DEFEND, INDEMNIFY, NOR HOLD YOU HARMLESS FOR ANY CLAIMS
-#  ARISING FROM OR RELATED TO THE CODE; AND (D)WITH RESPECT TO YOUR EXERCISE
-#  OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, CLOUDERA IS NOT LIABLE FOR ANY
-#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR
-#  CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO, DAMAGES
-#  RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF
-#  BUSINESS ADVANTAGE OR UNAVAILABILITY, OR LOSS OR CORRUPTION OF
-#  DATA.
-#
-# #  Author(s): Paul de Fusco
-#***************************************************************************/
-
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
