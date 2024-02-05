@@ -51,6 +51,8 @@ In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is i
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
   - Leave all other settings to default values and run the job.  
 
+![alt text](../../img/part3-cdeairflowjob-1.png)
+
 ##### Create Airflow Job
 
 Open the "airflow_dag.py" script located in the "cde_airflow_jobs" folder. Familiarize yourself with the code an notice:
@@ -67,7 +69,22 @@ Edit the username variable at line 49. Then navigate to the CDE Jobs UI and crea
 
 Select Airflow as the Job Type, assign a unique CDE Job name based on your user, and then run the Job.  
 
+![alt text](../../img/part3-cdeairflowjob-2.png)
+
+Monitor the execution of the pipeline from the Job Runs UI. Notice an Airflow Job will be triggered and successively the four CDE Spark Jobs will run one by one.
+
+While the job is in-flight open the Airflow UI and monitor execution.
+
+![alt text](../../img/part3-cdeairflowjob-3.png)
+
+![alt text](../../img/part3-cdeairflowjob-4.png)
+
+
 ### Summary
+
+Each CDE virtual cluster includes an embedded instance of Apache Airflow. With Airflow based pipelines users can specify their Spark pipeline using a simple python configuration file called the Airflow DAG.
+
+A basic CDE Airflow DAG can be composed of a mix of hive and spark operators that automatically run jobs on CDP Data Warehouse (CDW) and CDE, respectively; with the underlying security and governance provided by SDX.
 
 ### References
 

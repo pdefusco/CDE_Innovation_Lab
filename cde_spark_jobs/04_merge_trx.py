@@ -91,19 +91,6 @@ spark.sql("ALTER TABLE spark_catalog.{}.TRX_TABLE ADD PARTITION FIELD MONTHS(eve
 ### ALTERNATIVE SYNTAX VIA ICEBERG DF API IF MERGE INTO IS JUST APPEND
 trxBatchDf.writeTo("spark_catalog.{}.TRX_TABLE".format(username)).append()
 
-"""trxBatchDf.createOrReplaceTempView("BATCH_TEMP_VIEW".format(username))
-
-ICEBERG_MERGE_INTO_SYNTAX = """
-
-"""MERGE INTO spark_catalog.{}.TRX_TABLE t
-                                USING (SELECT * FROM BATCH_TEMP_VIEW) s
-                                ON t.credit_card_number = s.credit_card_number
-                                WHEN MATCHED THEN UPDATE SET *
-                                WHEN NOT MATCHED THEN INSERT *"""
-""".format(username)
-
-spark.sql(ICEBERG_MERGE_INTO_SYNTAX)"""
-
 #-----------------------------------------------------
 #               PARTITION EVOLUTION TRX TABLE BY DAY
 #-----------------------------------------------------
