@@ -1,10 +1,10 @@
 # Part 1: Apache Spark in CDE
 
-* [A Brief Introduction to Spark](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
-* [Lab 1: Run PySpark Interactive Session](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
-* [Lab 2: Create CDE Resources and Run CDE Spark Job](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cde-service)
-* [Summary]()
-* [Useful Links and Resources]()
+* [A Brief Introduction to Spark](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_01_spark.md#a-brief-introduction-to-spark)
+* [Lab 1: Run PySpark Interactive Session](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_01_spark.md#lab-1-run-pyspark-interactive-session)
+* [Lab 2: Create CDE Resources and Run CDE Spark Job](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_01_spark.md#lab-2-create-cde-resources-and-run-cde-spark-job)
+* [Summary](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_01_spark.md#summary)
+* [Useful Links and Resources](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_01_spark.md#useful-links-and-resources)
 
 ### A Brief Introduction to Spark
 

@@ -1,9 +1,9 @@
 # Part 2: Apache Iceberg in CDE
 
-* [A Brief Introduction to Apache Iceberg](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
-* [Lab 1: Working with Iceberg in CDE Sessions](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
-* [Summary]()
-* [Useful Links and Resources]()
+* [A Brief Introduction to Apache Iceberg](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#a-brief-introduction-to-apache-iceberg)
+* [Lab 1: Working with Iceberg in CDE Sessions](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#lab-1-working-with-iceberg-in-cde-sessions)
+* [Summary](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#summary)
+* [Useful Links and Resources](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_02_iceberg.md#references)
 
 ### A Brief Introduction to Apache Iceberg
 
@@ -112,7 +112,7 @@ Iceberg lends itself well to a variety of use cases including Lakehouse Analytic
 
 CDE Virtual Clusters provide native support for Iceberg. Users can run Spark workloads and interact with their Iceberg tables via SQL statements. The Iceberg Metadata Layer tracks Iceberg table versions via Snapshots and provides Metadata Tables with snapshot and other useful information. In this Lab we used Iceberg to access the credit card transactions dataset as of a particular timestamp.
 
-### References
+### Useful Links and Resources
 
 If you are curious to learn more about the above features in the context of more advanced use cases, please visit the following references:
 

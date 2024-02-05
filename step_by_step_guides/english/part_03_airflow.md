@@ -1,8 +1,8 @@
 # Part 3: Apache Airflow in CDE
 
-* [A Brief Introduction to Apache Airflow](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#introduction-to-the-cde-service)
-* [Lab 1: Orchestrate Spark Pipeline with Airflow](https://github.com/pdefusco/CDE119_ACE_WORKSHOP/blob/main/step_by_step_guides/english/part01_cde_architecture.md#cdp-environment)
-* [Summary]()
+* [A Brief Introduction to Apache Airflow](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#a-brief-introduction-to-airflow)
+* [Lab 1: Orchestrate Spark Pipeline with Airflow](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#lab-1-orchestrate-spark-pipeline-with-airflow)
+* [Summary](https://github.com/pdefusco/CDE_Banking_HOL_MKT/blob/main/step_by_step_guides/english/part_03_airflow.md#summary)
 * [Useful Links and Resources]()
 
 ### A Brief Introduction to Airflow
@@ -93,7 +93,7 @@ Each CDE virtual cluster includes an embedded instance of Apache Airflow. With A
 
 A basic CDE Airflow DAG can be composed of a mix of hive and spark operators that automatically run jobs on CDP Data Warehouse (CDW) and CDE, respectively; with the underlying security and governance provided by SDX.
 
-### References
+### Useful Links and Resources
 
 * [Automating Data Pipelines Using Apache Airflow in CDE](https://docs.cloudera.com/data-engineering/cloud/orchestrate-workflows/topics/cde-airflow-dag-pipeline.html)
 * [Using CDE Airflow](https://github.com/pdefusco/Using_CDE_Airflow)
