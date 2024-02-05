@@ -242,7 +242,7 @@ def main():
     for i in range(int(maxParticipants)):
         if i+1 < 10:
             username = "user00" + str(i+1)
-        elif i+1 > 9 & i+1 < 99:
+        elif i+1 > 9 and i+1 < 99:
             username = "user0" + str(i+1)
         elif i+1 > 99:
             username = "user" + str(i+1)

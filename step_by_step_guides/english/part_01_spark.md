@@ -4,7 +4,13 @@
 
 You can explore data interactively in CDE Sessions.
 
-Launch a CDE Session and run the following commands:
+Navigate to the CDE Home Page and launch a PySPark Session:
+
+![alt text](../../img/cde_thankyou.png)
+
+
+
+ and run the following commands:
 
 ```
 from os.path import exists
