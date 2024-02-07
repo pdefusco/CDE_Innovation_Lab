@@ -24,7 +24,7 @@ At a high level, the workflow will be similar to Part 1 and 2 where you created 
 
 ##### Create Spark Jobs
 
-In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is important that you do not run the Spark Jobs when you create them. If you do run them by mistake, please raise your hand during the workshop and ask for someone to help you implement a workaround.
+In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is important that you ***do not run the Spark Jobs when you create them***. If you do run them by mistake, please raise your hand during the workshop and ask for someone to help you implement a workaround.
 
 1. Data Validation:
   - Name: name this after your user e.g. if you are user "user010" call it "02_data_val_user010"
@@ -32,7 +32,7 @@ In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is i
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Python Environment: choose your CDE Python resource from the dropdown
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
-  - Leave all other settings to default values and run the job.
+  - Leave all other settings to default values and create the job.
 
 2. Customer Data Load:
   - Name: name this after your user e.g. if you are user "user010" call it "03_cust_data_user010"
@@ -40,21 +40,21 @@ In this section you will create four CDE Spark Jobs via the CDE Jobs UI. It is i
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Python Environment: choose your CDE Python resource from the dropdown
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
-  - Leave all other settings to default values and run the job.
+  - Leave all other settings to default values and create the job.
 
 3. Merge Transactions:
   - Name: name this after your user e.g. if you are user "user010" call it "04_merge_trx_user010"
   - Application File: "04_merge_trx.py" located in your CDE Files resource.
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
-  - Leave all other settings to default values and run the job.  
+  - Leave all other settings to default values and create the job.  
 
 4. Incremental Report:
   - Name: name this after your user e.g. if you are user "user010" call it "05_inc_report_user010"
   - Application File: "05_incremental_report.py" located in your CDE Files resource.
   - Arguments: enter your username here, without quotes (just text) e.g. if you are user "user010" enter "user010" without quotes
   - Files & Resources: choose your CDE Files resource from the dropdown (this should have already been prefilled for you)
-  - Leave all other settings to default values and run the job.  
+  - Leave all other settings to default values and create the job.  
 
 ![alt text](../../img/part3-cdesparkjob-1.png)
 
