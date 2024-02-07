@@ -121,3 +121,4 @@ If you are curious to learn more about the above features in the context of more
 * [Using Apache Iceberg in Cloudera Data Engineering](https://docs.cloudera.com/data-engineering/cloud/manage-jobs/topics/cde-using-iceberg.html)
 * [Importing and Migrating Iceberg Table in Spark 3](https://docs.cloudera.com/data-engineering/cloud/manage-jobs/topics/cde-iceberg-import-migrate-table.html)
 * [Getting Started with Iceberg and Spark](https://iceberg.apache.org/docs/latest/spark-getting-started/)
+* [Iceberg SQL Syntax](https://iceberg.apache.org/docs/latest/spark-queries/)
