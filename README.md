@@ -1,5 +1,8 @@
 # CDE Innovation Lab
 
+>**⚠ Warning**  
+>This Guide was created for CDE versions up until 1.18. As of March 2025 the latest CDE version is 1.23. Please use the updated version of the HOL available at [this GitHub repository](https://github.com/pdefusco/CDE_123_HOL).
+
 ## About the Innovation Lab
 
 Innovation Labs are an initiative by Cloudera Solutions Engineering aimed at familiarizing CDP users with each Data Service. The content consists of a series of guides and exercises to quickly implement sample end-to-end use cases in the realm of Machine Learning, Datawarehousing, Data Engineering, Data Streaming and Operational Database.

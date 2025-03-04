@@ -46,7 +46,7 @@ from airflow.operators.python import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.models.param import Param
 
-username = "user100" # Enter your username here
+username = "user092" # Enter your username here
 dag_name = "BankFraud-Orch-"+username
 
 print("Using DAG Name: {}".format(dag_name))
